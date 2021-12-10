@@ -38,12 +38,146 @@ Tugas pertama kalian yaitu membuat topologi jaringan sesuai dengan rancangan yan
 ### Soal
 Karena kalian telah belajar subnetting dan routing, Luffy ingin meminta kalian untuk membuat topologi tersebut menggunakan teknik CIDR atau VLSM. setelah melakukan subnetting,
 ### Penjelasan Jawaban
+Menentukan jumlah ip yang diperlukan di setiap subnet dan netmasknya menggunakan teknik VLSM
+|Subnet|Host|Mask|
+|------|----|----|
+|A1    |3   |/29 |
+|A2    |101 |/25 |
+|A3    |701 |/22 |
+|A4    |2   |/30 |
+|A5    |2   |/30 |
+|A6    |301 |/23 |
+|A7    |201 |/24 |
+|A8    |3   |/29 |
+|Total |1314|/21 |
 
+Dari tabel di atas, dapat dilihat bahwa total IP adalah 1314, sehingga digunakan netmask /21.
+![image](https://user-images.githubusercontent.com/72771774/145614835-bddf88c9-80ed-4732-94ce-e0841864e8aa.png)
+<br>
+Dari tree tersebut, dapat ditemukan Network ID, Netmask, dan Broadcast ID seperti tabel berikut :
+<table>
+<tbody>
+  <tr>
+    <td rowspan="3">A1</td>
+    <td>Network ID</td>
+    <td>192.193.0.0</td>
+  </tr>
+  <tr>
+    <td>Netmask</td>
+    <td>255.255.255.248</td>
+  </tr>
+  <tr>
+    <td>Broadcast Address</td>
+    <td>192.193.0.7</td>
+  </tr>
+  <tr>
+    <td rowspan="3">A2</td>
+    <td>Network ID</td>
+    <td>192.193.0.128</td>
+  </tr>
+  <tr>
+    <td>Netmask</td>
+    <td>255.255.255.128</td>
+  </tr>
+  <tr>
+    <td>Broadcast Address</td>
+    <td>192.193.0.255</td>
+  </tr>
+  <tr>
+    <td rowspan="3">A3</td>
+    <td>Network ID</td>
+    <td>192.193.4.0</td>
+  </tr>
+  <tr>
+    <td>Netmask</td>
+    <td>255.255.252.0</td>
+  </tr>
+  <tr>
+    <td>Broadcast Address</td>
+    <td>192.193.7.255</td>
+  </tr>
+  <tr>
+    <td rowspan="3">A4 </td>
+    <td>Network ID</td>
+    <td>192.193.0.16</td>
+  </tr>
+  <tr>
+    <td>Netmask</td>
+    <td>255.255.255.252</td>
+  </tr>
+  <tr>
+    <td>Broadcast Address</td>
+    <td>192.193.0.19</td>
+  </tr>
+  <tr>
+    <td rowspan="3">A5</td>
+    <td>Network ID</td>
+    <td>192.193.0.20</td>
+  </tr>
+  <tr>
+    <td>Netmask</td>
+    <td>255.255.255.252</td>
+  </tr>
+  <tr>
+    <td>Broadcast Address</td>
+    <td>192.193.0.23</td>
+  </tr>
+  <tr>
+    <td rowspan="3">A6</td>
+    <td>Network ID</td>
+    <td>192.193.2.0</td>
+  </tr>
+  <tr>
+    <td>Netmask</td>
+    <td>255.255.254.0</td>
+  </tr>
+  <tr>
+    <td>Broadcast Address</td>
+    <td>192.193.3.255</td>
+  </tr>
+  <tr>
+    <td rowspan="3">A7</td>
+    <td>Network ID</td>
+    <td>192.193.1.0</td>
+  </tr>
+  <tr>
+    <td>Netmask</td>
+    <td>255.255.255.0</td>
+  </tr>
+  <tr>
+    <td>Broadcast Address</td>
+    <td>192.193.1.255</td>
+  </tr>
+  <tr>
+    <td rowspan="3">A8</td>
+    <td>Network ID</td>
+    <td>192.193.0.8</td>
+  </tr>
+  <tr>
+    <td>Netmask</td>
+    <td>255.255.255.248</td>
+  </tr>
+  <tr>
+    <td>Broadcast Address</td>
+    <td>192.193.0.15</td>
+  </tr>
+</tbody>
+</table>
 
 ## C
 ### Soal
 Kalian juga diharuskan melakukan Routing agar setiap perangkat pada jaringan tersebut dapat terhubung.
 ### Penjelasan Jawaban
+|Router|Subnet|Network ID|Netmask|Next Hop|
+|------|------|----------|-------|--------|
+|Foosha|A1    |192.193.0.0|255.255.255.248|192.193.0.18|
+|Foosha|A2    |192.193.0.128|255.255.255.128|192.193.0.18|
+|Foosha|A3    |192.193.4.0|255.255.252.0|192.193.0.18|
+|Foosha|A6    |192.193.2.0|255.255.254.0|192.193.0.22|
+|Foosha|A7    |192.193.1.0|255.255.255.0|192.193.0.22|
+|Foosha|A8    |192.193.0.8|255.255.255.248|192.193.0.22|
+|Water7|Default|0.0.0.0|0.0.0.0|192.193.0.17|
+|Guanhao|Default|0.0.0.0|0.0.0.0|192.193.0.21|
 
 ## D
 ### Soal
