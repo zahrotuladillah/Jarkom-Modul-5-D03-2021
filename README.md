@@ -239,6 +239,34 @@ Uji coba untuk Jipangu:<br/>
 **Kemudian kalian diminta untuk membatasi akses ke Doriki yang berasal dari subnet Blueno, Cipher, Elena dan Fukuro dengan beraturan sebagai berikut**
 Akses dari subnet Blueno dan Cipher hanya diperbolehkan pada pukul 07.00 - 15.00 pada hari Senin sampai Kamis.
 ### Penjelasan Jawaban
+Di Doriki ditambahkan rule seperti berikut
+```
+iptables -A INPUT -s 192.193.0.128/25 -m time --timestart 07:00 --timestop 15:00 --weekdays Mon,Tue,Wed,Thu -j ACCEPT
+iptables -A INPUT -s 192.193.4.0/22 -m time --timestart 07:00 --timestop 15:00 --weekdays Mon,Tue,Wed,Thu -j ACCEPT
+iptables -A INPUT -s 192.193.0.128/25 -j REJECT
+iptables -A INPUT -s 192.193.4.0/22 -j REJECT
+```
+Command tersebut akan memfilter INPUT yang berasal dari subnet 192.193.0.128/25(Blueno) dan 192.193.4.0/22(Cipher) dengan bantuan module time. Untuk koneksi yang memiliki waktu antara 07:00 sampai 15:00 di hari Senin, Selasa, Rabu, dan Kamis akan di-ACCEPT sedangkan koneksi lain yang tidak sesuai rule tadi akan di-REJECT.
+
+Uji coba dari Blueno:<br/>
+**Hari Sabtu jam 08:00**<br/>
+![image](https://user-images.githubusercontent.com/29938033/145665366-3e503604-f11e-48d4-9c09-6639a1f6a9d4.png)
+
+**Hari Kamis jam 06:00**<br/>
+![image](https://user-images.githubusercontent.com/29938033/145665399-913f925b-7e57-4191-8dda-a8ab6740cf9e.png)
+
+**Hari Kamis jam 08:00**<br/>
+![image](https://user-images.githubusercontent.com/29938033/145665406-82972c81-dbc6-4f17-bab9-acff2051f7e2.png)
+
+Uji coba dari Cipher:<br/>
+**Hari Sabtu jam 08:00**<br/>
+![image](https://user-images.githubusercontent.com/29938033/145665446-18f230b3-00eb-47d2-bed6-6d36a87dc8d0.png)
+
+**Hari Kamis jam 06:00**<br/>
+![image](https://user-images.githubusercontent.com/29938033/145665451-5114958d-6408-40f3-b203-470e83989517.png)
+
+**Hari Kamis jam 08:00**<br/>
+![image](https://user-images.githubusercontent.com/29938033/145665455-ed60be6f-d11b-4b81-ae48-5fd99750835e.png)
 
 
 ## 5
