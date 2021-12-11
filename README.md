@@ -201,11 +201,42 @@ Kalian diminta untuk mendrop semua akses HTTP dari luar Topologi kalian pada ser
 ### Soal
 Karena kelompok kalian maksimal terdiri dari 3 orang. Luffy meminta kalian untuk membatasi DHCP dan DNS Server hanya boleh menerima maksimal 3 koneksi ICMP secara bersamaan menggunakan iptables, selebihnya didrop.
 ### Penjelasan Jawaban
+Di Doriki(DNS) dan Jipangu(DHCP), ditambahkan rule seperti berikut
+```
+iptables -A INPUT -p icmp -m connlimit --connlimit-above 3 --connlimit-mask 0 -j DROP
+```
+Command tersebut akan memfilter INPUT yang memiliki protokol icmp jika koneksinya lebih dari 3 dari subnet manapun dengan bantuan module connlimit.
+
+Uji coba untuk Doriki:<br/>
+**Host 1**<br/>
+![image](https://user-images.githubusercontent.com/29938033/145664975-ff239967-38af-4b5d-a712-37288b5d89df.png)
+
+**Host 2**<br/>
+![image](https://user-images.githubusercontent.com/29938033/145665003-a726204e-3ff3-4027-b177-6bfee3ff20ff.png)
+
+**Host 3**<br/>
+![image](https://user-images.githubusercontent.com/29938033/145665011-fd3f6962-0698-4dba-aa9a-379dc29ca6bd.png)
+
+**Host 4**<br/>
+![image](https://user-images.githubusercontent.com/29938033/145665036-1a7474ee-e931-4898-a004-4b38bd2cd7ee.png)
+
+Uji coba untuk Jipangu:<br/>
+**Host 1**<br/>
+![image](https://user-images.githubusercontent.com/29938033/145665058-c4d2effd-69a8-4c89-a69c-628ff70d592e.png)
+
+**Host 2**<br/>
+![image](https://user-images.githubusercontent.com/29938033/145665064-42ce388c-b3f7-4a28-8ebe-df7e24af6cd2.png)
+
+**Host 3**<br/>
+![image](https://user-images.githubusercontent.com/29938033/145665083-9cabba7b-0e94-4d68-83b0-8e2cf9a3ec11.png)
+
+**Host 4**<br/>
+![image](https://user-images.githubusercontent.com/29938033/145665121-8bd2778c-fdd3-4d82-9ef9-4cb2b1ff324b.png)
 
 
-**Kemudian kalian diminta untuk membatasi akses ke Doriki yang berasal dari subnet Blueno, Cipher, Elena dan Fukuro dengan beraturan sebagai berikut**
 ## 4
 ### Soal
+**Kemudian kalian diminta untuk membatasi akses ke Doriki yang berasal dari subnet Blueno, Cipher, Elena dan Fukuro dengan beraturan sebagai berikut**
 Akses dari subnet Blueno dan Cipher hanya diperbolehkan pada pukul 07.00 - 15.00 pada hari Senin sampai Kamis.
 ### Penjelasan Jawaban
 
