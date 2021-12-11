@@ -272,9 +272,29 @@ Uji coba dari Cipher:<br/>
 ## 5
 ### Soal
 Akses dari subnet Elena dan Fukuro hanya diperbolehkan pada pukul 15.01 hingga pukul 06.59 setiap harinya.
-### Penjelasan Jawaban
-
 **Selain itu di reject**
+### Penjelasan Jawaban
+Di Doriki kembali ditambahkan rule seperti berikut
+```
+iptables -A INPUT -s 192.193.2.0/23 -m time --timestart 07:00 --timestop 15:00 -j REJECT
+iptables -A INPUT -s 192.193.1.0/24 -m time --timestart 07:00 --timestop 15:00 -j REJECT
+```
+Command tersebut akan memfilter INPUT yang berasal dari subnet 192.193.2.0/23(Elena) dan 192.193.1.0/24(Fukurou) dengan bantuan module time. Untuk koneksi yang memiliki waktu antara 07:00 sampai 15:00 akan di-REJECT sedangkan sisanya akan dilanjutkan akan di-ACCEPT.
+
+Uji coba dari Elena:<br/>
+**Hari Sabtu jam 08:00**<br/>
+![image](https://user-images.githubusercontent.com/29938033/145665735-ec2ac004-d2f1-4662-a006-7c90e2447618.png)
+
+**Hari Sabtu jam 06:00**<br/>
+![image](https://user-images.githubusercontent.com/29938033/145665746-30e17bb9-9d14-426a-8953-5ce627f3521b.png)
+
+Uji coba dari Fukurou:<br/>
+**Hari Sabtu jam 08:00**<br/>
+![image](https://user-images.githubusercontent.com/29938033/145665762-9f5cb17e-4525-4a34-926b-e930bd644435.png)
+
+**Hari Sabtu jam 06:00**<br/>
+![image](https://user-images.githubusercontent.com/29938033/145665775-a79038b3-2dc2-42cf-8147-c08e0501194a.png)
+
 ## 6
 ### Soal
 Karena kita memiliki 2 Web Server, Luffy ingin Guanhao disetting sehingga setiap request dari client yang mengakses DNS Server akan didistribusikan secara bergantian pada Jorge dan Maingate
