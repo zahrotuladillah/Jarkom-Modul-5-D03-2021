@@ -205,7 +205,7 @@ Di Doriki(DNS) dan Jipangu(DHCP), ditambahkan rule seperti berikut
 ```
 iptables -A INPUT -p icmp -m connlimit --connlimit-above 3 --connlimit-mask 0 -j DROP
 ```
-Command tersebut akan memfilter INPUT yang memiliki protokol icmp jika koneksinya lebih dari 3 dari subnet manapun dengan bantuan module connlimit.
+Command tersebut akan memfilter INPUT yang memiliki protokol icmp jika koneksinya lebih dari 3 dari subnet manapun dengan bantuan module `connlimit`.
 
 Uji coba untuk Doriki:<br/>
 **Host 1**<br/>
@@ -246,7 +246,7 @@ iptables -A INPUT -s 192.193.4.0/22 -m time --timestart 07:00 --timestop 15:00 -
 iptables -A INPUT -s 192.193.0.128/25 -j REJECT
 iptables -A INPUT -s 192.193.4.0/22 -j REJECT
 ```
-Command tersebut akan memfilter INPUT yang berasal dari subnet 192.193.0.128/25(Blueno) dan 192.193.4.0/22(Cipher) dengan bantuan module time. Untuk koneksi yang memiliki waktu antara 07:00 sampai 15:00 di hari Senin, Selasa, Rabu, dan Kamis akan di-ACCEPT sedangkan koneksi lain yang tidak sesuai rule tadi akan di-REJECT.
+Command tersebut akan memfilter INPUT yang berasal dari subnet 192.193.0.128/25(Blueno) dan 192.193.4.0/22(Cipher) dengan bantuan module `time`. Untuk koneksi yang memiliki waktu antara 07:00 sampai 15:00 di hari Senin, Selasa, Rabu, dan Kamis akan di-ACCEPT sedangkan koneksi lain yang tidak sesuai rule tadi akan di-REJECT.
 
 Uji coba dari Blueno:<br/>
 **Hari Sabtu jam 08:00**<br/>
@@ -279,7 +279,7 @@ Di Doriki kembali ditambahkan rule seperti berikut
 iptables -A INPUT -s 192.193.2.0/23 -m time --timestart 07:00 --timestop 15:00 -j REJECT
 iptables -A INPUT -s 192.193.1.0/24 -m time --timestart 07:00 --timestop 15:00 -j REJECT
 ```
-Command tersebut akan memfilter INPUT yang berasal dari subnet 192.193.2.0/23(Elena) dan 192.193.1.0/24(Fukurou) dengan bantuan module time. Untuk koneksi yang memiliki waktu antara 07:00 sampai 15:00 akan di-REJECT sedangkan sisanya akan dilanjutkan akan di-ACCEPT.
+Command tersebut akan memfilter INPUT yang berasal dari subnet 192.193.2.0/23(Elena) dan 192.193.1.0/24(Fukurou) dengan bantuan module `time`. Untuk koneksi yang memiliki waktu antara 07:00 sampai 15:00 akan di-REJECT sedangkan sisanya akan dilanjutkan akan di-ACCEPT.
 
 Uji coba dari Elena:<br/>
 **Hari Sabtu jam 08:00**<br/>
@@ -299,6 +299,39 @@ Uji coba dari Fukurou:<br/>
 ### Soal
 Karena kita memiliki 2 Web Server, Luffy ingin Guanhao disetting sehingga setiap request dari client yang mengakses DNS Server akan didistribusikan secara bergantian pada Jorge dan Maingate
 ### Penjelasan Jawaban
+Di Jorge dan Maingate, install webserver dengan command `apt-get update && apt-get install apache2 -y` dan kemudian ubah isi `/var/www/html/index.html` di Jorge:
+```html
+<!DOCTYPE html>
+<head>
+    <title>Jorge</title>
+</head>
+<body>
+    <h1>Mengakses Jorge</h1>
+</body>
+</html>
+```
+sedangkan di Maingate, isi `/var/www/html/index.html` diubah menjadi:
+```html
+<!DOCTYPE html>
+<head>
+    <title>Maingate</title>
+</head>
+<body>
+    <h1>Mengakses Maingate</h1>
+</body>
+</html>
+```
+file `index.html` diubah agar mudah membedakan server yang diakses ketika testing nanti. Server lalu diaktifkan dengan menjalankan `service apache2 start`
+
+Kemudian di Guanhao, tambahkan rule iptables berikut:
+```
+iptables -A PREROUTING -t nat -p tcp -d 192.193.0.2 --dport 80 -m statistic --mode nth --every 2 --packet 0 -j DNAT --to-destination 192.193.0.10:80
+iptables -A PREROUTING -t nat -p tcp -d 192.193.0.2 --dport 80 -j DNAT --to-destination 192.193.0.11:80
+```
+Rule tersebut akan merubah destination paket dengan protokol tcp, tujuan 192.193.0.2 (IP Doriki), di port 80 ke IP Maingate atau Jorge dengan bantuan modul `statistic`. Mode nth berarti akan menggunakan algorith round robin. Parameter every 2 dan packet 0 akan berarti untuk setiap 2 paket dari paket 0 akan diarahkan ke `192.193.0.10:80`. Sedangkan sisanya akan diarahkan ke `192.193.0.11:80`.
+
+Untuk testing, install wget di Elena atau Fukurou dengan command `apt-get install wget -y` kemudian jalankan `wget -qO- 192.193.0.2` beberapa kali<br/>
+![image](https://user-images.githubusercontent.com/29938033/145666285-1c662d98-20f2-4305-823e-c32972bccef3.png)
 
 
 **Luffy berterima kasih pada kalian karena telah membantunya. Luffy juga mengingatkan agar semua aturan iptables harus disimpan pada sistem atau paling tidak kalian menyediakan script sebagai backup.**
