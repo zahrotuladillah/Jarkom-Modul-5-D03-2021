@@ -22,17 +22,18 @@ Setelah kalian mempelajari semua modul yang telah diberikan, Luffy ingin meminta
 ### Soal
 Tugas pertama kalian yaitu membuat topologi jaringan sesuai dengan rancangan yang diberikan Luffy dibawah ini:
 ![image](https://user-images.githubusercontent.com/72771774/145141897-9b37aac8-a71b-4491-9287-9f831f63a50b.png)
-```Keterangan : 	
-    Doriki adalah DNS Server
-		Jipangu adalah DHCP Server
-		Maingate dan Jorge adalah Web Server
-		Jumlah Host pada Blueno adalah 100 host
-		Jumlah Host pada Cipher adalah 700 host
-		Jumlah Host pada Elena adalah 300 host
-		Jumlah Host pada Fukurou adalah 200 host
+```
+Keterangan : 	
+	Doriki adalah DNS Server
+	Jipangu adalah DHCP Server
+	Maingate dan Jorge adalah Web Server
+	Jumlah Host pada Blueno adalah 100 host
+	Jumlah Host pada Cipher adalah 700 host
+	Jumlah Host pada Elena adalah 300 host
+	Jumlah Host pada Fukurou adalah 200 host
 ```
 ### Penjelasan Jawaban
-
+![image](https://user-images.githubusercontent.com/74708771/145672341-10fe2b42-58eb-424f-9ddd-8993bdaf6212.png)
 
 ## B
 ### Soal
@@ -183,18 +184,92 @@ Kalian juga diharuskan melakukan Routing agar setiap perangkat pada jaringan ter
 ### Soal
 Tugas berikutnya adalah memberikan ip pada subnet Blueno, Cipher, Fukurou, dan Elena secara dinamis menggunakan bantuan DHCP server. Kemudian kalian ingat bahwa kalian harus setting DHCP Relay pada router yang menghubungkannya.
 ### Penjelasan Jawaban
+Install `apt-get install isc-dhcp-relay -y` pada Water7, Foosha, dan Guanhao lalu install `apt-get install isc-dhcp-server` pada Jipangu
 
+Lalu, tambahkan pengaturan pada file `/etc/default/isc-dhcp-relay` dan edit server dengan mengarahkan dchp-relay menuju Jipangu `192.193.0.3`
+```
+SERVERS="192.193.0.3"
+```
+
+Pada Jipangu edit file `/etc/default/isc-dhcp-server` dengan menambahkan
+```
+INTERFACES="eth0"
+```
+
+Selanjutnya, isikan pengaturan pada `/etc/dhcp/dhcpd.conf` menjadi seperti berikut
+```
+subnet 192.186.1.0 netmask 255.255.255.0 {
+    range 192.186.1.2 192.186.1.254;
+    option routers 192.186.1.1;
+    option broadcast-address 192.186.1.255;
+    option domain-name-servers 192.186.0.18;
+    default-lease-time 600;
+    max-lease-time 7200;
+}
+subnet 192.186.0.128 netmask 255.255.255.128 {
+    range 192.186.0.130 192.186.0.254;
+    option routers 192.186.0.129;
+    option broadcast-address 192.186.0.255;
+    option domain-name-servers 192.186.0.18;
+    default-lease-time 600;
+    max-lease-time 7200;
+}
+subnet 192.186.4.0 netmask 255.255.252.0 {
+    range 192.186.4.2 192.186.4.254;
+    option routers 192.186.4.1;
+    option broadcast-address 192.186.4.255;
+    option domain-name-servers 192.186.0.18;
+    default-lease-time 600;
+    max-lease-time 7200;
+}
+subnet 192.186.2.0 netmask 255.255.254.0 {
+    range 192.186.2.2 192.186.2.254;
+    option routers 192.186.2.1;
+    option broadcast-address 192.186.2.255;
+    option domain-name-servers 192.186.0.18;
+    default-lease-time 600;
+    max-lease-time 7200;
+}
+subnet 192.186.0.16 netmask 255.255.255.248{
+}
+```
+
+Lalu, ubah file `/etc/network/interfaces` pada Blueno, Cipher, Fukurou, dan Elena menjadi
+```
+auto eth0
+iface eth0 inet dhcp
+```
 
 ## 1
 ### Soal
 Agar topologi yang kalian buat dapat mengakses keluar, kalian diminta untuk mengkonfigurasi Foosha menggunakan iptables, tetapi Luffy tidak ingin menggunakan MASQUERADE.
 ### Penjelasan Jawaban
+Jalankan command pada Foosha dengan command berikut:
+```
+ipEth0=`hostname -I | awk '{print $1}'`
+
+iptables -t nat -A POSTROUTING -o eth0 -j SNAT --to-source $ipEth0
+```
+
+Hasil ping dari Water7:
+![image](https://user-images.githubusercontent.com/74708771/145672712-4f47993a-3016-4ca7-ad3b-2163015b998f.png)
 
 
 ## 2
 ### Soal
 Kalian diminta untuk mendrop semua akses HTTP dari luar Topologi kalian pada server yang merupakan DHCP Server dan DNS Server demi menjaga keamanan.
 ### Penjelasan Jawaban
+Jalankan command pada Jipangu dan Doriki dengan command:
+```
+iptables -A FORWARD -p tcp --dport 80 -d 192.193.0.0/29 -i eth0 -j DROP
+```
+Testing:
+Pada Jipangu dan Doriki install netcat 	`apt-get install netcat` lalu jalankan `nc -l -p 80`
+Lalu, pada Foosha jalankan `nmap -p 80 192.193.0.2` mengarah ke Doriki dan `nmap -p 80 192.193.0.3` mengarah ke Jipangu.
+Ke Doriki:
+![image](https://user-images.githubusercontent.com/74708771/145672883-bfc0dfe5-90a0-4cf3-bcee-e5bb640c6061.png)
+Ke Jipangu:
+![image](https://user-images.githubusercontent.com/74708771/145672917-5796cc8b-ffa1-4cbd-84d8-5065a740fefb.png)
 
 
 ## 3
